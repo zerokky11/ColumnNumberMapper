@@ -1,6 +1,5 @@
 ﻿Imports System.Collections.Generic
 Imports System.Linq
-Imports System.Windows.Forms.LinkLabel
 Imports Autodesk.Revit.DB
 
 Public Class ParameterUpdater
@@ -15,7 +14,7 @@ Public Class ParameterUpdater
         Logger.Log($"대상 링크: {links.Count}개")
         Logger.Log($"매핑 데이터: {mappingData.Count}개")
 
-        For Each link In links
+        For Each link As RevitLinkInstance In links
             Logger.Log($"링크 파일 처리 중: {link.Name}")
 
             Dim linkDoc As Document = link.GetLinkDocument()
@@ -25,7 +24,7 @@ Public Class ParameterUpdater
             End If
 
             ' 이 링크에 해당하는 매핑 데이터 필터링
-            Dim relevantMappings = mappingData.Where(Function(m) m.StructuralLinkName = link.Name).ToList()
+            Dim relevantMappings As List(Of MatchResult) = mappingData.Where(Function(m) m.StructuralLinkName = link.Name).ToList()
 
             If relevantMappings.Count = 0 Then
                 Logger.Log($"  - 매핑 데이터 없음, 건너뜀")
@@ -39,7 +38,7 @@ Public Class ParameterUpdater
                 Try
                     trans.Start()
 
-                    For Each mapping In relevantMappings
+                    For Each mapping As MatchResult In relevantMappings
                         Try
                             ' Element ID로 요소 찾기
                             Dim elemId As New ElementId(Integer.Parse(mapping.StructuralElementId))

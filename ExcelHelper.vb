@@ -26,12 +26,12 @@ Public Class ExcelHelper
                           "EXCLUSION", "CLASS", "SAMOO-Other_1", "SAMOO-Other_2", "SAMOO-Other_3",
                           "SECC-Other_3", "SECC-Other_4"}
 
-            For col = 0 To headers.Length - 1
+            For col As Integer = 0 To headers.Length - 1
                 worksheet.Cells(1, col + 1) = headers(col)
             Next
 
             ' 데이터 작성
-            For row = 0 To data.Count - 1
+            For row As Integer = 0 To data.Count - 1
                 Dim obj = data(row)
                 worksheet.Cells(row + 2, 1) = obj.LinkFileName
                 worksheet.Cells(row + 2, 2) = obj.ElementId
@@ -103,12 +103,12 @@ Public Class ExcelHelper
                           "StructuralX", "StructuralY", "StructuralZ", "GenericX", "GenericY", "GenericZ",
                           "Distance(mm)", "ColumnNumber", "IsPerfectMatch", "Comment"}
 
-            For col = 0 To headers.Length - 1
+            For col As Integer = 0 To headers.Length - 1
                 worksheet.Cells(1, col + 1) = headers(col)
             Next
 
             ' 데이터 작성
-            For row = 0 To results.Count - 1
+            For row As Integer = 0 To results.Count - 1
                 Dim res = results(row)
                 worksheet.Cells(row + 2, 1) = res.StructuralLinkName
                 worksheet.Cells(row + 2, 2) = res.GenericLinkName
@@ -176,7 +176,7 @@ Public Class ExcelHelper
 
             Dim lastRow = worksheet.Cells(worksheet.Rows.Count, 1).End(XlDirection.xlUp).Row
 
-            For row = 2 To lastRow
+            For row As Integer = 2 To lastRow
                 Dim obj As New ObjectData With {
                     .LinkFileName = GetCellValue(worksheet.Cells(row, 1)),
                     .ElementId = GetCellValue(worksheet.Cells(row, 2)),
@@ -240,7 +240,7 @@ Public Class ExcelHelper
 
             Dim lastRow = worksheet.Cells(worksheet.Rows.Count, 1).End(XlDirection.xlUp).Row
 
-            For row = 2 To lastRow
+            For row As Integer = 2 To lastRow
                 Dim res As New MatchResult With {
                     .StructuralLinkName = GetCellValue(worksheet.Cells(row, 1)),
                     .GenericLinkName = GetCellValue(worksheet.Cells(row, 2)),

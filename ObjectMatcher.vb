@@ -25,7 +25,7 @@ Public Class ObjectMatcher
 
         Logger.Log($"발견된 링크 파일 쌍: {linkPairs.Count}개")
 
-        For Each pair In linkPairs
+        For Each pair As LinkPair In linkPairs
             Logger.Log($"매칭 중: {pair.StructuralLinkName} <-> {pair.GenericLinkName}")
 
             ' 해당 링크에서 데이터 필터링
@@ -35,7 +35,7 @@ Public Class ObjectMatcher
             Logger.Log($"  Structural: {structObjs.Count}개, Generic: {genObjs.Count}개")
 
             ' XY 좌표 기반 매칭
-            For Each structObj In structObjs
+            For Each structObj As ObjectData In structObjs
                 Dim match = FindBestMatch(structObj, genObjs)
 
                 If match IsNot Nothing Then
@@ -61,8 +61,8 @@ Public Class ObjectMatcher
             Next
         Next
 
-        Dim perfectCount = results.Count(Function(r) r.IsPerfectMatch)
-        Dim reviewCount = results.Count(Function(r) Not r.IsPerfectMatch)
+        Dim perfectCount As Integer = results.Where(Function(r) r.IsPerfectMatch).Count()
+        Dim reviewCount As Integer = results.Where(Function(r) Not r.IsPerfectMatch).Count()
 
         Logger.Log($"=== 매칭 완료 ===")
         Logger.Log($"완벽 일치: {perfectCount}개")
@@ -77,7 +77,7 @@ Public Class ObjectMatcher
 
         Dim pairs As New List(Of LinkPair)
 
-        For Each sLink In structuralLinks
+        For Each sLink As RevitLinkInstance In structuralLinks
             Dim sName = sLink.Name
 
             ' 파일명에서 키워드 추출 (예: 1_A_a.rvt -> A)
@@ -85,7 +85,7 @@ Public Class ObjectMatcher
             If String.IsNullOrEmpty(sKeyword) Then Continue For
 
             ' 매칭되는 Generic 링크 찾기
-            For Each gLink In genericLinks
+            For Each gLink As RevitLinkInstance In genericLinks
                 Dim gName = gLink.Name
                 Dim gKeyword = ExtractKeyword(gName, "A")
 
@@ -110,16 +110,16 @@ Public Class ObjectMatcher
         ' 파일명 패턴: ***_XXX_*** 형태에서 가운데 키워드 추출
         Dim parts = fileName.Split("_"c)
 
-        For i = 0 To parts.Length - 1
+        For i As Integer = 0 To parts.Length - 1
             If parts(i).StartsWith(expectedKeyword, StringComparison.OrdinalIgnoreCase) Then
                 Return parts(i)
             End If
         Next
 
         ' 정확히 일치하는 부분 찾기
-        For Each Part In parts
-            If Part.Equals(expectedKeyword, StringComparison.OrdinalIgnoreCase) Then
-                Return Part
+        For Each partStr As String In parts
+            If partStr.Equals(expectedKeyword, StringComparison.OrdinalIgnoreCase) Then
+                Return partStr
             End If
         Next
 
@@ -138,7 +138,7 @@ Public Class ObjectMatcher
         Dim bestMatch As MatchInfo = Nothing
         Dim minDistance As Double = Double.MaxValue
 
-        For Each genObj In genObjs
+        For Each genObj As ObjectData In genObjs
             ' XY 평면 거리 계산 (feet 단위)
             Dim dx = (structObj.LocationX - genObj.LocationX) / 304.8 ' mm to feet
             Dim dy = (structObj.LocationY - genObj.LocationY) / 304.8

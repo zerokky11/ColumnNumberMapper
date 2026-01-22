@@ -1,8 +1,7 @@
 ﻿Imports System.Collections.Generic
-Imports System.Drawing
 Imports System.Linq
-Imports System.Windows.Forms
-Imports System.Windows.Forms.LinkLabel
+Imports WF = System.Windows.Forms
+Imports SD = System.Drawing
 Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
 
@@ -23,7 +22,7 @@ Public Class LinkSelector
         Dim allLinks = collector.OfClass(GetType(RevitLinkInstance)).Cast(Of RevitLinkInstance).ToList()
 
         If allLinks.Count = 0 Then
-            MessageBox.Show("프로젝트에 링크 파일이 없습니다.")
+            WF.MessageBox.Show("프로젝트에 링크 파일이 없습니다.")
             Logger.Log("링크 파일 없음")
             Return selectedLinks
         End If
@@ -32,11 +31,11 @@ Public Class LinkSelector
 
         ' 링크 선택 다이얼로그 표시
         Using selectForm As New LinkSelectionForm(allLinks, prompt)
-            If selectForm.ShowDialog() = DialogResult.OK Then
+            If selectForm.ShowDialog() = WF.DialogResult.OK Then
                 selectedLinks = selectForm.SelectedLinks
                 Logger.Log($"사용자가 선택한 링크: {selectedLinks.Count}개")
 
-                For Each link In selectedLinks
+                For Each link As RevitLinkInstance In selectedLinks
                     Logger.Log($"  - {link.Name}")
                 Next
             Else
@@ -49,14 +48,14 @@ Public Class LinkSelector
 End Class
 
 Public Class LinkSelectionForm
-    Inherits System.Windows.Forms.Form
+    Inherits WF.Form
 
     Private allLinks As List(Of RevitLinkInstance)
-    Private checkedListBox As CheckedListBox
-    Private btnOK As Button
-    Private btnCancel As Button
-    Private btnSelectAll As Button
-    Private btnDeselectAll As Button
+    Private checkedListBox As WF.CheckedListBox
+    Private btnOK As WF.Button
+    Private btnCancel As WF.Button
+    Private btnSelectAll As WF.Button
+    Private btnDeselectAll As WF.Button
 
     Public Property SelectedLinks As New List(Of RevitLinkInstance)
 
@@ -67,31 +66,31 @@ Public Class LinkSelectionForm
 
     Private Sub InitializeComponent(prompt As String)
         Me.Text = "링크 파일 선택"
-        Me.Size = New Size(600, 500)
-        Me.StartPosition = FormStartPosition.CenterScreen
-        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.Size = New SD.Size(600, 500)
+        Me.StartPosition = WF.FormStartPosition.CenterScreen
+        Me.FormBorderStyle = WF.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
 
         Dim y As Integer = 10
 
         ' 안내 레이블
-        Dim lblPrompt As New Label With {
+        Dim lblPrompt As New WF.Label With {
             .Text = prompt,
-            .Location = New Point(10, y),
-            .Size = New Size(560, 40),
-            .Font = New Font("맑은 고딕", 9, FontStyle.Bold)
+            .Location = New SD.Point(10, y),
+            .Size = New SD.Size(560, 40),
+            .Font = New SD.Font("맑은 고딕", 9, SD.FontStyle.Bold)
         }
         Me.Controls.Add(lblPrompt)
         y += 50
 
         ' CheckedListBox
-        checkedListBox = New CheckedListBox With {
-            .Location = New Point(10, y),
-            .Size = New Size(560, 320),
+        checkedListBox = New WF.CheckedListBox With {
+            .Location = New SD.Point(10, y),
+            .Size = New SD.Size(560, 320),
             .CheckOnClick = True
         }
 
-        For Each link In allLinks
+        For Each link As RevitLinkInstance In allLinks
             checkedListBox.Items.Add(link.Name, False)
         Next
 
@@ -99,37 +98,37 @@ Public Class LinkSelectionForm
         y += 330
 
         ' 전체 선택/해제 버튼
-        btnSelectAll = New Button With {
+        btnSelectAll = New WF.Button With {
             .Text = "전체 선택",
-            .Location = New Point(10, y),
-            .Size = New Size(100, 30)
+            .Location = New SD.Point(10, y),
+            .Size = New SD.Size(100, 30)
         }
         AddHandler btnSelectAll.Click, AddressOf BtnSelectAll_Click
         Me.Controls.Add(btnSelectAll)
 
-        btnDeselectAll = New Button With {
+        btnDeselectAll = New WF.Button With {
             .Text = "전체 해제",
-            .Location = New Point(120, y),
-            .Size = New Size(100, 30)
+            .Location = New SD.Point(120, y),
+            .Size = New SD.Size(100, 30)
         }
         AddHandler btnDeselectAll.Click, AddressOf BtnDeselectAll_Click
         Me.Controls.Add(btnDeselectAll)
 
         ' OK/Cancel 버튼
-        btnOK = New Button With {
+        btnOK = New WF.Button With {
             .Text = "확인",
-            .Location = New Point(370, y),
-            .Size = New Size(100, 30),
-            .DialogResult = DialogResult.OK
+            .Location = New SD.Point(370, y),
+            .Size = New SD.Size(100, 30),
+            .DialogResult = WF.DialogResult.OK
         }
         AddHandler btnOK.Click, AddressOf BtnOK_Click
         Me.Controls.Add(btnOK)
 
-        btnCancel = New Button With {
+        btnCancel = New WF.Button With {
             .Text = "취소",
-            .Location = New Point(470, y),
-            .Size = New Size(100, 30),
-            .DialogResult = DialogResult.Cancel
+            .Location = New SD.Point(470, y),
+            .Size = New SD.Size(100, 30),
+            .DialogResult = WF.DialogResult.Cancel
         }
         Me.Controls.Add(btnCancel)
 
@@ -138,13 +137,13 @@ Public Class LinkSelectionForm
     End Sub
 
     Private Sub BtnSelectAll_Click(sender As Object, e As EventArgs)
-        For i = 0 To checkedListBox.Items.Count - 1
+        For i As Integer = 0 To checkedListBox.Items.Count - 1
             checkedListBox.SetItemChecked(i, True)
         Next
     End Sub
 
     Private Sub BtnDeselectAll_Click(sender As Object, e As EventArgs)
-        For i = 0 To checkedListBox.Items.Count - 1
+        For i As Integer = 0 To checkedListBox.Items.Count - 1
             checkedListBox.SetItemChecked(i, False)
         Next
     End Sub
@@ -152,14 +151,14 @@ Public Class LinkSelectionForm
     Private Sub BtnOK_Click(sender As Object, e As EventArgs)
         SelectedLinks.Clear()
 
-        For i = 0 To checkedListBox.CheckedIndices.Count - 1
+        For i As Integer = 0 To checkedListBox.CheckedIndices.Count - 1
             Dim index = checkedListBox.CheckedIndices(i)
             SelectedLinks.Add(allLinks(index))
         Next
 
         If SelectedLinks.Count = 0 Then
-            MessageBox.Show("최소 1개 이상의 링크를 선택해야 합니다.")
-            Me.DialogResult = DialogResult.None
+            WF.MessageBox.Show("최소 1개 이상의 링크를 선택해야 합니다.")
+            Me.DialogResult = WF.DialogResult.None
         End If
     End Sub
 End Class

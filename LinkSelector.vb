@@ -49,7 +49,7 @@ Public Class LinkSelector
 End Class
 
 Public Class LinkSelectionForm
-    Inherits Form
+    Inherits System.Windows.Forms.Form
 
     Private allLinks As List(Of RevitLinkInstance)
     Private checkedListBox As CheckedListBox

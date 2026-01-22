@@ -39,7 +39,7 @@ Public Class ColumnNumberMapper
 End Class
 
 Public Class MainForm
-    Inherits Form
+    Inherits System.Windows.Forms.Form
 
     Private uiDoc As UIDocument
     Private doc As Document
@@ -48,7 +48,7 @@ Public Class MainForm
     Private btnStep3 As Button
     Private btnStep4 As Button
     Private lblStatus As Label
-    Private txtTolerance As TextBox
+    Private txtTolerance As System.Windows.Forms.TextBox
     Private lblTolerance As Label
 
     Private structuralLinksData As New List(Of RevitLinkInstance)
@@ -80,7 +80,7 @@ Public Class MainForm
         }
         Me.Controls.Add(lblTolerance)
 
-        txtTolerance = New TextBox With {
+        txtTolerance = New System.Windows.Forms.TextBox With {
             .Text = "50",
             .Location = New Point(180, y),
             .Size = New Size(80, 20)

@@ -97,7 +97,7 @@ Public Class DataExtractor
         End If
 
         ' BoundingBox 중심점 시도
-        Dim bb = elem.get_BoundingBox(Nothing)
+        Dim bb = elem.BoundingBox(Nothing)
         If bb IsNot Nothing Then
             Return (bb.Min + bb.Max) / 2
         End If

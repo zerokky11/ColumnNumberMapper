@@ -131,7 +131,7 @@ Public Class ObjectMatcher
         Dim sPattern = sName.Replace(sKeyword, "{KEYWORD}")
         Dim gPattern = gName.Replace(gKeyword, "{KEYWORD}")
 
-        Return sPattern.Equals(gPattern, StringComparison.OrdinalIgnoreCase)
+        Return String.Equals(sPattern, gPattern, StringComparison.OrdinalIgnoreCase)
     End Function
 
     Private Function FindBestMatch(structObj As ObjectData, genObjs As List(Of ObjectData)) As MatchInfo

@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.Windows.Forms.LinkLabel
 Imports Autodesk.Revit.DB
 
 Public Class DataExtractor
@@ -7,7 +6,7 @@ Public Class DataExtractor
     Public Function ExtractData(links As List(Of RevitLinkInstance), category As BuiltInCategory, hostDoc As Document) As List(Of ObjectData)
         Dim results As New List(Of ObjectData)
 
-        For Each link In links
+        For Each link As RevitLinkInstance In links
             Logger.Log($"링크 파일 처리 중: {link.Name}")
 
             Dim linkDoc As Document = link.GetLinkDocument()
@@ -18,11 +17,11 @@ Public Class DataExtractor
 
             ' 카테고리 필터
             Dim collector As New FilteredElementCollector(linkDoc)
-            Dim elements = collector.OfCategory(category).WhereElementIsNotElementType().ToElements()
+            Dim elements As IList(Of Element) = collector.OfCategory(category).WhereElementIsNotElementType().ToElements()
 
             Logger.Log($"  - {elements.Count}개 요소 발견")
 
-            For Each elem In elements
+            For Each elem As Element In elements
                 Try
                     Dim objData As New ObjectData()
                     objData.LinkFileName = link.Name
@@ -98,7 +97,7 @@ Public Class DataExtractor
         End If
 
         ' BoundingBox 중심점 시도
-        Dim bb = elem.get_BoundingBox(Nothing)
+        Dim bb = elem.BoundingBox(Nothing)
         If bb IsNot Nothing Then
             Return (bb.Min + bb.Max) / 2
         End If

@@ -1,5 +1,5 @@
-﻿Imports System.Drawing
-Imports System.Windows.Forms
+﻿Imports WF = System.Windows.Forms
+Imports SD = System.Drawing
 Imports Autodesk.Revit.Attributes
 Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
@@ -20,7 +20,7 @@ Public Class ColumnNumberMapper
         Try
             ' 메인 폼 표시
             Using mainForm As New MainForm(uiDoc)
-                If mainForm.ShowDialog() = DialogResult.OK Then
+                If mainForm.ShowDialog() = WF.DialogResult.OK Then
                     Logger.Log("프로세스 완료")
                     TaskDialog.Show("완료", "작업이 성공적으로 완료되었습니다.")
                     Return Result.Succeeded
@@ -39,17 +39,17 @@ Public Class ColumnNumberMapper
 End Class
 
 Public Class MainForm
-    Inherits Form
+    Inherits WF.Form
 
     Private uiDoc As UIDocument
     Private doc As Document
-    Private btnStep1 As Button
-    Private btnStep2 As Button
-    Private btnStep3 As Button
-    Private btnStep4 As Button
-    Private lblStatus As Label
-    Private txtTolerance As TextBox
-    Private lblTolerance As Label
+    Private btnStep1 As WF.Button
+    Private btnStep2 As WF.Button
+    Private btnStep3 As WF.Button
+    Private btnStep4 As WF.Button
+    Private lblStatus As WF.Label
+    Private txtTolerance As WF.TextBox
+    Private lblTolerance As WF.Label
 
     Private structuralLinksData As New List(Of RevitLinkInstance)
     Private genericLinksData As New List(Of RevitLinkInstance)
@@ -65,44 +65,44 @@ Public Class MainForm
 
     Private Sub InitializeComponent()
         Me.Text = "Column Number Mapper"
-        Me.Size = New Size(500, 400)
-        Me.StartPosition = FormStartPosition.CenterScreen
-        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.Size = New SD.Size(500, 400)
+        Me.StartPosition = WF.FormStartPosition.CenterScreen
+        Me.FormBorderStyle = WF.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
 
         Dim y As Integer = 20
 
         ' 허용 오차 입력
-        lblTolerance = New Label With {
+        lblTolerance = New WF.Label With {
             .Text = "XY 좌표 허용 오차 (mm):",
-            .Location = New Point(20, y),
-            .Size = New Size(150, 20)
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(150, 20)
         }
         Me.Controls.Add(lblTolerance)
 
-        txtTolerance = New TextBox With {
+        txtTolerance = New WF.TextBox With {
             .Text = "50",
-            .Location = New Point(180, y),
-            .Size = New Size(80, 20)
+            .Location = New SD.Point(180, y),
+            .Size = New SD.Size(80, 20)
         }
         Me.Controls.Add(txtTolerance)
         y += 40
 
         ' Step 1 버튼
-        btnStep1 = New Button With {
+        btnStep1 = New WF.Button With {
             .Text = "Step 1: Structural Columns 추출",
-            .Location = New Point(20, y),
-            .Size = New Size(450, 40)
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(450, 40)
         }
         AddHandler btnStep1.Click, AddressOf BtnStep1_Click
         Me.Controls.Add(btnStep1)
         y += 50
 
         ' Step 2 버튼
-        btnStep2 = New Button With {
+        btnStep2 = New WF.Button With {
             .Text = "Step 2: Generic Models 추출",
-            .Location = New Point(20, y),
-            .Size = New Size(450, 40),
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(450, 40),
             .Enabled = False
         }
         AddHandler btnStep2.Click, AddressOf BtnStep2_Click
@@ -110,10 +110,10 @@ Public Class MainForm
         y += 50
 
         ' Step 3 버튼
-        btnStep3 = New Button With {
+        btnStep3 = New WF.Button With {
             .Text = "Step 3: 매핑 분석 및 결과 출력",
-            .Location = New Point(20, y),
-            .Size = New Size(450, 40),
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(450, 40),
             .Enabled = False
         }
         AddHandler btnStep3.Click, AddressOf BtnStep3_Click
@@ -121,10 +121,10 @@ Public Class MainForm
         y += 50
 
         ' Step 4 버튼
-        btnStep4 = New Button With {
+        btnStep4 = New WF.Button With {
             .Text = "Step 4: S5_EQCODE 값 업데이트",
-            .Location = New Point(20, y),
-            .Size = New Size(450, 40),
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(450, 40),
             .Enabled = False
         }
         AddHandler btnStep4.Click, AddressOf BtnStep4_Click
@@ -132,12 +132,12 @@ Public Class MainForm
         y += 50
 
         ' 상태 표시 레이블
-        lblStatus = New Label With {
+        lblStatus = New WF.Label With {
             .Text = "Step 1부터 시작하세요.",
-            .Location = New Point(20, y),
-            .Size = New Size(450, 60),
-            .BorderStyle = BorderStyle.FixedSingle,
-            .TextAlign = CONTENTALIGNMENT.MiddleLeft
+            .Location = New SD.Point(20, y),
+            .Size = New SD.Size(450, 60),
+            .BorderStyle = WF.BorderStyle.FixedSingle,
+            .TextAlign = SD.ContentAlignment.MiddleLeft
         }
         Me.Controls.Add(lblStatus)
     End Sub
@@ -151,7 +151,7 @@ Public Class MainForm
             structuralLinksData = selector.SelectLinks("Structural Columns를 추출할 링크 파일을 선택하세요.")
 
             If structuralLinksData.Count = 0 Then
-                MessageBox.Show("선택된 링크가 없습니다.")
+                WF.MessageBox.Show("선택된 링크가 없습니다.")
                 Return
             End If
 
@@ -162,12 +162,12 @@ Public Class MainForm
             Dim data = extractor.ExtractData(structuralLinksData, BuiltInCategory.OST_StructuralColumns, doc)
 
             ' 엑셀로 내보내기
-            Dim sfd As New SaveFileDialog With {
+            Dim sfd As New WF.SaveFileDialog With {
                 .Filter = "Excel Files|*.xlsx",
                 .FileName = "Step1_StructuralColumns_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".xlsx"
             }
 
-            If sfd.ShowDialog() = DialogResult.OK Then
+            If sfd.ShowDialog() = WF.DialogResult.OK Then
                 step1ExcelPath = sfd.FileName
                 ExcelHelper.ExportToExcel(data, step1ExcelPath, "Structural Columns")
                 lblStatus.Text = $"Step 1 완료! {data.Count}개 객체 추출됨." & vbCrLf & $"파일: {step1ExcelPath}"
@@ -177,7 +177,7 @@ Public Class MainForm
 
         Catch ex As Exception
             Logger.LogError("Step 1 오류: " & ex.Message)
-            MessageBox.Show("오류: " & ex.Message)
+            WF.MessageBox.Show("오류: " & ex.Message)
         End Try
     End Sub
 
@@ -190,7 +190,7 @@ Public Class MainForm
             genericLinksData = selector.SelectLinks("Generic Models를 추출할 링크 파일을 선택하세요.")
 
             If genericLinksData.Count = 0 Then
-                MessageBox.Show("선택된 링크가 없습니다.")
+                WF.MessageBox.Show("선택된 링크가 없습니다.")
                 Return
             End If
 
@@ -201,12 +201,12 @@ Public Class MainForm
             Dim data = extractor.ExtractData(genericLinksData, BuiltInCategory.OST_GenericModel, doc)
 
             ' 엑셀로 내보내기
-            Dim sfd As New SaveFileDialog With {
+            Dim sfd As New WF.SaveFileDialog With {
                 .Filter = "Excel Files|*.xlsx",
                 .FileName = "Step2_GenericModels_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".xlsx"
             }
 
-            If sfd.ShowDialog() = DialogResult.OK Then
+            If sfd.ShowDialog() = WF.DialogResult.OK Then
                 step2ExcelPath = sfd.FileName
                 ExcelHelper.ExportToExcel(data, step2ExcelPath, "Generic Models")
                 lblStatus.Text = $"Step 2 완료! {data.Count}개 객체 추출됨." & vbCrLf & $"파일: {step2ExcelPath}"
@@ -216,7 +216,7 @@ Public Class MainForm
 
         Catch ex As Exception
             Logger.LogError("Step 2 오류: " & ex.Message)
-            MessageBox.Show("오류: " & ex.Message)
+            WF.MessageBox.Show("오류: " & ex.Message)
         End Try
     End Sub
 
@@ -226,7 +226,7 @@ Public Class MainForm
         Try
             Dim tolerance As Double
             If Not Double.TryParse(txtTolerance.Text, tolerance) Then
-                MessageBox.Show("유효한 허용 오차를 입력하세요.")
+                WF.MessageBox.Show("유효한 허용 오차를 입력하세요.")
                 Return
             End If
 
@@ -244,17 +244,17 @@ Public Class MainForm
             Dim matchResults = matcher.MatchObjects(structuralData, genericData, structuralLinksData, genericLinksData)
 
             ' 결과를 엑셀로 내보내기
-            Dim sfd As New SaveFileDialog With {
+            Dim sfd As New WF.SaveFileDialog With {
                 .Filter = "Excel Files|*.xlsx",
                 .FileName = "Step3_MappingResults_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".xlsx"
             }
 
-            If sfd.ShowDialog() = DialogResult.OK Then
+            If sfd.ShowDialog() = WF.DialogResult.OK Then
                 step3ExcelPath = sfd.FileName
                 ExcelHelper.ExportMappingResults(matchResults, step3ExcelPath)
 
-                Dim perfectCount = matchResults.Count(Function(m) m.IsPerfectMatch)
-                Dim needReviewCount = matchResults.Count(Function(m) Not m.IsPerfectMatch)
+                Dim perfectCount As Integer = matchResults.Where(Function(m) m.IsPerfectMatch).Count()
+                Dim needReviewCount As Integer = matchResults.Where(Function(m) Not m.IsPerfectMatch).Count()
 
                 lblStatus.Text = $"Step 3 완료!" & vbCrLf &
                                 $"완벽 매칭: {perfectCount}개, 검토 필요: {needReviewCount}개" & vbCrLf &
@@ -267,7 +267,7 @@ Public Class MainForm
 
         Catch ex As Exception
             Logger.LogError("Step 3 오류: " & ex.Message)
-            MessageBox.Show("오류: " & ex.Message)
+            WF.MessageBox.Show("오류: " & ex.Message)
         End Try
     End Sub
 
@@ -276,12 +276,12 @@ Public Class MainForm
 
         Try
             ' 검토 완료된 엑셀 파일 선택
-            Dim ofd As New OpenFileDialog With {
+            Dim ofd As New WF.OpenFileDialog With {
                 .Filter = "Excel Files|*.xlsx",
                 .Title = "검토 완료된 매핑 결과 파일을 선택하세요"
             }
 
-            If ofd.ShowDialog() <> DialogResult.OK Then
+            If ofd.ShowDialog() <> WF.DialogResult.OK Then
                 Return
             End If
 
@@ -295,7 +295,7 @@ Public Class MainForm
             Dim selectedLinks = selector.SelectLinks("S5_EQCODE를 업데이트할 링크 파일들을 선택하세요.")
 
             If selectedLinks.Count = 0 Then
-                MessageBox.Show("선택된 링크가 없습니다.")
+                WF.MessageBox.Show("선택된 링크가 없습니다.")
                 Return
             End If
 
@@ -310,16 +310,16 @@ Public Class MainForm
 
             Logger.Log($"Step 4 완료: 성공 {result.SuccessCount}, 실패 {result.FailCount}")
 
-            MessageBox.Show($"업데이트 완료!" & vbCrLf &
+            WF.MessageBox.Show($"업데이트 완료!" & vbCrLf &
                            $"성공: {result.SuccessCount}개" & vbCrLf &
                            $"실패: {result.FailCount}개", "완료")
 
-            Me.DialogResult = DialogResult.OK
+            Me.DialogResult = WF.DialogResult.OK
             Me.Close()
 
         Catch ex As Exception
             Logger.LogError("Step 4 오류: " & ex.Message)
-            MessageBox.Show("오류: " & ex.Message)
+            WF.MessageBox.Show("오류: " & ex.Message)
         End Try
     End Sub
 End Class
